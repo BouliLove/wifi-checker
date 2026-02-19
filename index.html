@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vérificateur Qualité WiFi Bureau — Sora</title>
+
+  <!-- Google Fonts: Inter + Source Code Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- Sora Design System -->
+  <link rel="stylesheet" href="../design-system/tokens.css">
+  <link rel="stylesheet" href="../design-system/components.css">
+
+  <style>
+    /* ============================================================
+       APP SHELL
+       ============================================================ */
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    body {
+      background: var(--color-bg-light);
+    }
+
+    /* ============================================================
+       EXTENDED TAGS (not in design system)
+       ============================================================ */
+    .tag-green {
+      background: var(--color-green);
+      color: var(--color-white);
+    }
+    .tag-orange {
+      background: var(--color-orange);
+      color: var(--color-white);
+    }
+
+    /* ============================================================
+       VIEW SYSTEM
+       ============================================================ */
+    .view {
+      display: none;
+      min-height: 100vh;
+    }
+    .view--active {
+      display: block;
+    }
+
+    /* ============================================================
+       VIEW 1: SETUP
+       ============================================================ */
+    .setup-view {
+      background: var(--color-bg-light);
+      padding: 48px 24px;
+    }
+
+    .setup-inner {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .setup-header {
+      margin-bottom: 40px;
+    }
+
+    .setup-title {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: var(--fw-regular);
+      color: var(--color-primary);
+      margin: 0 0 8px 0;
+      line-height: 1.1;
+    }
+
+    .setup-subtitle {
+      font-family: var(--font-body);
+      font-size: var(--text-body-2);
+      font-weight: var(--fw-medium);
+      color: rgba(14,14,14,0.5);
+      margin: 0;
+    }
+
+    .setup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-2);
+      font-weight: var(--fw-semibold);
+      color: rgba(14,14,14,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Employee count row */
+    .employee-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .employee-input {
+      width: 80px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .employee-slider {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(14,14,14,0.15);
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .employee-slider::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      cursor: pointer;
+    }
+
+    .employee-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      cursor: pointer;
+      border: none;
+    }
+
+    .employee-error {
+      font-family: var(--font-body);
+      font-size: var(--text-body-3);
+      color: var(--color-red);
+      display: none;
+    }
+
+    .employee-error.visible {
+      display: block;
+    }
+
+    /* Test tags list */
+    .test-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .run-btn {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    /* ============================================================
+       VIEW 2: TESTING
+       ============================================================ */
+    .testing-view {
+      background: var(--color-primary);
+      min-height: 100vh;
+      color: var(--color-white);
+      padding: 40px 24px;
+    }
+
+    .testing-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .testing-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .testing-office-name {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: var(--fw-regular);
+      color: var(--color-white);
+    }
+
+    .cancel-btn {
+      color: rgba(255,255,255,0.5) !important;
+    }
+
+    .cancel-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.08) !important;
+      color: var(--color-white) !important;
+    }
+
+    /* Progress bar */
+    .progress-bar-track {
+      height: 4px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 2px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--color-blue);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    /* Phase list */
+    .phase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .phase-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .phase-item:last-child {
+      border-bottom: none;
+    }
+
+    .phase-dot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 2px;
+      flex-shrink: 0;
+      width: 12px;
+    }
+
+    .phase-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      transition: background 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .phase-item[data-status="active"] .phase-dot {
+      background: var(--color-blue);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .phase-item[data-status="done"] .phase-dot {
+      background: var(--color-green);
+    }
+
+    .phase-item[data-status="error"] .phase-dot {
+      background: var(--color-red);
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(140,200,255,0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(140,200,255,0); }
+    }
+
+    .phase-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .phase-name {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-2);
+      font-weight: var(--fw-semibold);
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      transition: color 0.3s ease;
+    }
+
+    .phase-item[data-status="active"] .phase-name {
+      color: var(--color-white);
+    }
+
+    .phase-item[data-status="done"] .phase-name {
+      color: rgba(255,255,255,0.6);
+    }
+
+    .phase-item[data-status="error"] .phase-name {
+      color: var(--color-red);
+    }
+
+    .phase-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-2);
+      font-weight: var(--fw-semibold);
+      color: var(--color-blue);
+      white-space: nowrap;
+    }
+
+    .phase-desc {
+      font-family: var(--font-body);
+      font-size: var(--text-body-3);
+      color: rgba(255,255,255,0.3);
+      margin-top: 2px;
+    }
+
+    .phase-item[data-status="active"] .phase-desc {
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ============================================================
+       VIEW 3: RESULTS
+       ============================================================ */
+    .results-view {
+      background: var(--color-bg-light);
+      padding: 40px 24px 80px;
+    }
+
+    .results-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .results-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: var(--fw-regular);
+      color: var(--color-primary);
+      margin: 0;
+    }
+
+    .results-meta {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-1);
+      color: rgba(14,14,14,0.4);
+    }
+
+    /* ISP bar */
+    .isp-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--color-white);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+    }
+
+    .isp-bar-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-2);
+      font-weight: var(--fw-semibold);
+      color: rgba(14,14,14,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .isp-bar-value {
+      font-family: var(--font-body);
+      font-size: var(--text-body-2);
+      font-weight: var(--fw-semibold);
+      color: var(--color-primary);
+    }
+
+    .isp-bar-ip {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-1);
+      color: rgba(14,14,14,0.4);
+      margin-left: auto;
+    }
+
+    /* Section heading */
+    .section-heading {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-2);
+      font-weight: var(--fw-semibold);
+      color: rgba(14,14,14,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0 0 12px 0;
+    }
+
+    /* Metric cards grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 560px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+
+    .metric-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .metric-card-name {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-1);
+      font-weight: var(--fw-medium);
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-card-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .metric-card-value {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: var(--fw-semibold);
+      color: var(--color-blue);
+      line-height: 1;
+    }
+
+    .metric-card-sub {
+      font-family: var(--font-body);
+      font-size: var(--text-body-3);
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* Per-employee card */
+    .employee-card {
+      margin-bottom: 24px;
+    }
+
+    .employee-card-top {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .employee-mbps {
+      font-family: var(--font-mono);
+      font-size: 40px;
+      font-weight: var(--fw-semibold);
+      color: var(--color-primary);
+      line-height: 1;
+    }
+
+    .employee-mbps-unit {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-2);
+      color: rgba(14,14,14,0.4);
+    }
+
+    .usecase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .usecase-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(14,14,14,0.08);
+    }
+
+    .usecase-row:last-child {
+      border-bottom: none;
+    }
+
+    .usecase-name {
+      font-family: var(--font-body);
+      font-size: var(--text-body-2);
+      font-weight: var(--fw-medium);
+      color: var(--color-primary);
+    }
+
+    .usecase-threshold {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-1);
+      color: rgba(14,14,14,0.4);
+    }
+
+    .employee-summary {
+      font-family: var(--font-body);
+      font-size: var(--text-body-2);
+      color: rgba(14,14,14,0.55);
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(14,14,14,0.08);
+    }
+
+    /* Summary card */
+    .summary-card {
+      background: var(--color-primary);
+      border-radius: 12px;
+      padding: 32px;
+      color: var(--color-white);
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 560px) {
+      .summary-card { flex-direction: column; align-items: center; }
+    }
+
+    .score-ring-wrap {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-svg {
+      width: 120px;
+      height: 120px;
+    }
+
+    .score-ring-track {
+      fill: none;
+      stroke: rgba(255,255,255,0.1);
+      stroke-width: 8;
+    }
+
+    .score-ring-fill {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: 60px 60px;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1), stroke 0.5s ease;
+    }
+
+    .score-number {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: var(--fw-regular);
+      fill: var(--color-white);
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .summary-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .verdict-headline {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: var(--fw-regular);
+      color: var(--color-white);
+      margin: 0 0 16px 0;
+      line-height: 1.2;
+    }
+
+    .recommendations-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recommendations-list li {
+      font-family: var(--font-body);
+      font-size: var(--text-body-2);
+      color: rgba(255,255,255,0.6);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .recommendations-list li::before {
+      content: '→';
+      font-family: var(--font-mono);
+      color: var(--color-blue);
+      flex-shrink: 0;
+      margin-top: 0px;
+    }
+
+    /* Results footer */
+    .results-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid rgba(14,14,14,0.1);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .results-timestamp {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-1);
+      color: rgba(14,14,14,0.35);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================================================================
+       VIEW 1: SETUP
+       ================================================================ -->
+  <div id="view-setup" class="view view--active setup-view">
+    <div class="setup-inner">
+
+      <div class="setup-header">
+        <h1 class="setup-title">Vérificateur Qualité<br>WiFi Bureau</h1>
+        <p class="setup-subtitle">8 mesures · analyse ~60 secondes · recommandations concrètes</p>
+      </div>
+
+      <div class="setup-form">
+
+        <!-- Office Name -->
+        <div class="form-group">
+          <label class="form-label" for="office-name">Nom du bureau <span style="opacity:0.5">(optionnel)</span></label>
+          <input
+            id="office-name"
+            class="input"
+            type="text"
+            placeholder="ex. Siège — Étage 3"
+            maxlength="60"
+          >
+        </div>
+
+        <!-- Employee Count -->
+        <div class="form-group">
+          <label class="form-label" for="employee-count">Utilisateurs simultanés</label>
+          <div class="employee-row">
+            <button class="btn btn-outline btn-s" id="employee-dec" aria-label="Diminuer">−</button>
+            <input
+              id="employee-count"
+              class="input employee-input"
+              type="number"
+              min="1"
+              max="500"
+              value="25"
+            >
+            <button class="btn btn-outline btn-s" id="employee-inc" aria-label="Augmenter">+</button>
+            <input
+              id="employee-slider"
+              class="employee-slider"
+              type="range"
+              min="1"
+              max="500"
+              value="25"
+              aria-label="Curseur nombre d'utilisateurs"
+            >
+          </div>
+          <div class="employee-error" id="employee-error">Veuillez saisir un nombre valide d'utilisateurs (1–500)</div>
+        </div>
+
+        <!-- Test tags -->
+        <div class="form-group">
+          <div class="form-label">Tests inclus</div>
+          <div class="test-tags">
+            <span class="tag tag-white">Latence</span>
+            <span class="tag tag-white">Gigue</span>
+            <span class="tag tag-white">Pertes de paquets</span>
+            <span class="tag tag-white">Téléchargement</span>
+            <span class="tag tag-white">Envoi</span>
+            <span class="tag tag-white">Résolution DNS</span>
+            <span class="tag tag-white">Consistance</span>
+            <span class="tag tag-white">Par utilisateur</span>
+          </div>
+        </div>
+
+        <!-- Run button -->
+        <button class="btn btn-fill-blue btn-m run-btn" id="run-btn">
+          LANCER L'ANALYSE
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       VIEW 2: TESTING
+       ================================================================ -->
+  <div id="view-testing" class="view testing-view">
+    <div class="testing-inner">
+
+      <div class="testing-topbar">
+        <div class="testing-office-name" id="testing-office-name">Analyse en cours</div>
+        <button class="btn btn-ghost btn-s cancel-btn" id="cancel-btn">ANNULER</button>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+
+      <!-- Phase list -->
+      <div class="phase-list" id="phase-list">
+        <!-- Populated by JS -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================================
+       VIEW 3: RESULTS
+       ================================================================ -->
+  <div id="view-results" class="view results-view">
+    <div class="results-inner">
+
+      <!-- Header -->
+      <div class="results-header">
+        <h2 class="results-title" id="results-title">Résultats de l'analyse</h2>
+        <div class="results-meta" id="results-meta"></div>
+      </div>
+
+      <!-- ISP Bar -->
+      <div class="isp-bar" id="isp-bar" style="display:none"></div>
+
+      <!-- Metric Cards -->
+      <p class="section-heading">Métriques de performance</p>
+      <div class="metrics-grid" id="metrics-grid">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Per-Employee Analysis -->
+      <p class="section-heading">Bande passante par utilisateur</p>
+      <div class="card employee-card" id="employee-card">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Summary -->
+      <p class="section-heading">Évaluation globale</p>
+      <div class="summary-card" id="summary-card">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Footer -->
+      <div class="results-footer">
+        <div class="results-timestamp" id="results-timestamp"></div>
+        <button class="btn btn-outline btn-m" id="run-again-btn">RELANCER</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

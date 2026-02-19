@@ -1,0 +1,131 @@
+/* ============================================================
+   SORA DESIGN SYSTEM — CSS TOKENS
+   Source: Figma "Sora - Design System" (pZilmrGk9dUsw3wsNG6l06)
+   Last synced: 2026-02-19
+   ============================================================ */
+
+:root {
+
+  /* ----------------------------------------------------------
+     COLORS — Core
+     ---------------------------------------------------------- */
+  --color-primary:          #0E0E0E;   /* near-black, main bg */
+  --color-surface-dark:     #1E1E1E;   /* dark card / nav bg */
+  --color-surface-darker:   #141414;   /* radio bg */
+  --color-bg-light:         #F2F2F2;   /* light gray bg */
+  --color-white:            #FFFFFF;   /* white / text on dark */
+
+  /* ----------------------------------------------------------
+     COLORS — Brand Accents
+     ---------------------------------------------------------- */
+  --color-blue:             #8CC8FF;   /* primary accent */
+  --color-red:              #FF4545;   /* error / danger */
+  --color-green:            #00AB8C;   /* success */
+  --color-orange:           #FF733C;   /* accent */
+  --color-beige:            #F4EADF;   /* soft accent */
+
+  /* ----------------------------------------------------------
+     COLORS — Add-on Palette
+     ---------------------------------------------------------- */
+  --color-dark-green:       #00493C;
+  --color-teal:             #43AAA5;
+  --color-purple:           #908CFF;
+  --color-pink:             #FFBCBD;
+  --color-yellow:           #F5DD90;
+
+  /* ----------------------------------------------------------
+     COLORS — Semantic
+     ---------------------------------------------------------- */
+  --color-success:          var(--color-green);
+  --color-error:            var(--color-red);
+  --color-info:             var(--color-blue);
+  --color-warning:          var(--color-orange);
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Font Families
+     ---------------------------------------------------------- */
+  --font-display:   'Power Grotesk', sans-serif;   /* headings / titles */
+  --font-body:      'Inter', sans-serif;            /* body text */
+  --font-mono:      'Source Code Pro', monospace;  /* buttons / captions / code */
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Type Scale
+     ---------------------------------------------------------- */
+
+  /* Title (Power Grotesk) */
+  --text-title-1:   72px;
+  --text-title-2:   56px;
+  --text-title-3:   48px;
+  --text-title-4:   32px;
+
+  /* Headline */
+  --text-headline-1: 28px;   /* Inter SemiBold */
+  --text-headline-2: 28px;   /* Power Grotesk */
+
+  /* Body (Inter) */
+  --text-body-1:    24px;
+  --text-body-2:    14px;
+  --text-body-3:    10px;
+
+  /* Button / Captions (Source Code Pro) */
+  --text-button:    12px;
+  --text-caption-1: 10px;
+  --text-caption-2: 12px;
+  --text-caption-3: 8px;
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Font Weights
+     ---------------------------------------------------------- */
+  --fw-light:       300;
+  --fw-regular:     400;
+  --fw-medium:      500;
+  --fw-semibold:    600;
+
+  /* ----------------------------------------------------------
+     COMPONENT — Buttons
+     ---------------------------------------------------------- */
+  /* Sizes */
+  --btn-height-m:   40px;
+  --btn-height-s:   32px;
+  --btn-height-xs:  24px;
+
+  /* Variants */
+  --btn-fill-bg:         var(--color-primary);
+  --btn-fill-text:       var(--color-white);
+  --btn-fill-blue-bg:    var(--color-blue);
+  --btn-fill-blue-text:  var(--color-primary);
+  --btn-fill-red-bg:     var(--color-red);
+  --btn-fill-red-text:   var(--color-white);
+
+  --btn-outline-border:  var(--color-primary);
+  --btn-outline-text:    var(--color-primary);
+
+  --btn-ghost-text:      var(--color-primary);
+
+  /* ----------------------------------------------------------
+     COMPONENT — Tags
+     ---------------------------------------------------------- */
+  --tag-black-bg:   var(--color-primary);
+  --tag-black-text: var(--color-white);
+  --tag-blue-bg:    var(--color-blue);
+  --tag-blue-text:  var(--color-primary);
+  --tag-red-bg:     var(--color-red);
+  --tag-red-text:   var(--color-white);
+  --tag-white-bg:   var(--color-white);
+  --tag-white-text: var(--color-primary);
+
+  /* ----------------------------------------------------------
+     COMPONENT — Toggle
+     ---------------------------------------------------------- */
+  --toggle-off:     var(--color-white);
+  --toggle-on:      var(--color-blue);
+
+  /* ----------------------------------------------------------
+     COMPONENT — Toaster
+     ---------------------------------------------------------- */
+  --toaster-blue:   var(--color-blue);
+  --toaster-black:  var(--color-primary);
+  --toaster-red:    var(--color-red);
+  --toaster-green:  var(--color-green);
+
+}

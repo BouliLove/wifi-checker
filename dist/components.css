@@ -1,0 +1,214 @@
+/* ============================================================
+   SORA DESIGN SYSTEM — Base Component Styles
+   Source: Figma "Sora - Design System" (pZilmrGk9dUsw3wsNG6l06)
+   Last synced: 2026-02-19
+
+   Import tokens.css before this file.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   RESET / BASE
+   ---------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body-2);         /* 14px default */
+  font-weight: var(--fw-medium);
+  color: var(--color-primary);
+  background-color: var(--color-bg-light);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ----------------------------------------------------------
+   TYPOGRAPHY UTILITIES
+   ---------------------------------------------------------- */
+.text-title-1   { font-family: var(--font-display); font-size: var(--text-title-1);    font-weight: var(--fw-regular); }
+.text-title-1-md{ font-family: var(--font-display); font-size: var(--text-title-1);    font-weight: var(--fw-medium); }
+.text-title-2   { font-family: var(--font-display); font-size: var(--text-title-2);    font-weight: var(--fw-regular); }
+.text-title-2-md{ font-family: var(--font-display); font-size: var(--text-title-2);    font-weight: var(--fw-medium); }
+.text-title-3   { font-family: var(--font-display); font-size: var(--text-title-3);    font-weight: var(--fw-regular); }
+.text-title-3-md{ font-family: var(--font-display); font-size: var(--text-title-3);    font-weight: var(--fw-medium); }
+.text-title-4   { font-family: var(--font-display); font-size: var(--text-title-4);    font-weight: var(--fw-regular); }
+.text-title-4-md{ font-family: var(--font-display); font-size: var(--text-title-4);    font-weight: var(--fw-medium); }
+.text-headline-1{ font-family: var(--font-body);    font-size: var(--text-headline-1); font-weight: var(--fw-semibold); }
+.text-headline-2{ font-family: var(--font-display); font-size: var(--text-headline-2); font-weight: var(--fw-regular); }
+.text-body-1-sb { font-family: var(--font-body);    font-size: var(--text-body-1);     font-weight: var(--fw-semibold); }
+.text-body-1-md { font-family: var(--font-body);    font-size: var(--text-body-1);     font-weight: var(--fw-medium); }
+.text-body-2-sb { font-family: var(--font-body);    font-size: var(--text-body-2);     font-weight: var(--fw-semibold); }
+.text-body-2-md { font-family: var(--font-body);    font-size: var(--text-body-2);     font-weight: var(--fw-medium); }
+.text-body-3-sb { font-family: var(--font-body);    font-size: var(--text-body-3);     font-weight: var(--fw-semibold); }
+.text-body-3-md { font-family: var(--font-body);    font-size: var(--text-body-3);     font-weight: var(--fw-medium); }
+.text-button    { font-family: var(--font-mono);    font-size: var(--text-button);     font-weight: var(--fw-semibold); }
+.text-caption-1 { font-family: var(--font-mono);    font-size: var(--text-caption-1);  font-weight: var(--fw-medium); }
+.text-caption-2 { font-family: var(--font-mono);    font-size: var(--text-caption-2);  font-weight: var(--fw-medium); }
+.text-caption-3 { font-family: var(--font-mono);    font-size: var(--text-caption-3);  font-weight: var(--fw-medium); }
+
+/* ----------------------------------------------------------
+   BUTTON
+   ---------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--text-button);
+  font-weight: var(--fw-semibold);
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Sizes */
+.btn-m  { height: var(--btn-height-m);  padding: 0 16px; }
+.btn-s  { height: var(--btn-height-s);  padding: 0 12px; }
+.btn-xs { height: var(--btn-height-xs); padding: 0 8px; }
+
+/* Fill — Black */
+.btn-fill {
+  background: var(--btn-fill-bg);
+  color: var(--btn-fill-text);
+}
+.btn-fill:hover:not(:disabled) { opacity: 0.85; }
+
+/* Fill — Blue */
+.btn-fill-blue {
+  background: var(--btn-fill-blue-bg);
+  color: var(--btn-fill-blue-text);
+}
+.btn-fill-blue:hover:not(:disabled) { opacity: 0.85; }
+
+/* Fill — Red */
+.btn-fill-red {
+  background: var(--btn-fill-red-bg);
+  color: var(--btn-fill-red-text);
+}
+.btn-fill-red:hover:not(:disabled) { opacity: 0.85; }
+
+/* Outline */
+.btn-outline {
+  background: transparent;
+  color: var(--btn-outline-text);
+  border: 1.5px solid var(--btn-outline-border);
+}
+.btn-outline:hover:not(:disabled) { background: rgba(14,14,14,0.06); }
+
+/* Ghost */
+.btn-ghost {
+  background: transparent;
+  color: var(--btn-ghost-text);
+}
+.btn-ghost:hover:not(:disabled) { background: rgba(14,14,14,0.06); }
+
+/* ----------------------------------------------------------
+   TAG
+   ---------------------------------------------------------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption-2);
+  font-weight: var(--fw-medium);
+}
+.tag-black { background: var(--tag-black-bg); color: var(--tag-black-text); }
+.tag-blue  { background: var(--tag-blue-bg);  color: var(--tag-blue-text); }
+.tag-red   { background: var(--tag-red-bg);   color: var(--tag-red-text); }
+.tag-white { background: var(--tag-white-bg); color: var(--tag-white-text); border: 1px solid var(--color-primary); }
+
+/* ----------------------------------------------------------
+   INPUT
+   ---------------------------------------------------------- */
+.input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1.5px solid rgba(14,14,14,0.2);
+  border-radius: 6px;
+  background: var(--color-white);
+  font-family: var(--font-body);
+  font-size: var(--text-body-2);
+  font-weight: var(--fw-medium);
+  color: var(--color-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.input::placeholder { color: rgba(14,14,14,0.4); }
+.input:hover  { border-color: rgba(14,14,14,0.4); }
+.input:focus  { border-color: var(--color-primary); }
+.input.error  { border-color: var(--color-red); }
+.input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ----------------------------------------------------------
+   TOGGLE
+   ---------------------------------------------------------- */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+.toggle input { display: none; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(14,14,14,0.15);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 2px;
+  left: 2px;
+  background: var(--toggle-off);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+.toggle input:checked + .toggle-slider { background: var(--toggle-on); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* ----------------------------------------------------------
+   CARD (base)
+   ---------------------------------------------------------- */
+.card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 20px;
+}
+.card-dark {
+  background: var(--color-surface-dark);
+  border-radius: 12px;
+  padding: 20px;
+  color: var(--color-white);
+}
+
+/* ----------------------------------------------------------
+   TOASTER
+   ---------------------------------------------------------- */
+.toaster {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: var(--text-body-2);
+  font-weight: var(--fw-medium);
+  color: var(--color-white);
+}
+.toaster-blue  { background: var(--toaster-blue);  color: var(--color-primary); }
+.toaster-black { background: var(--toaster-black); }
+.toaster-red   { background: var(--toaster-red); }
+.toaster-green { background: var(--toaster-green); }
