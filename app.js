@@ -1083,6 +1083,11 @@ function setupControls() {
     }, 500);
   });
 
+  // Print PDF button
+  document.getElementById('print-btn').addEventListener('click', () => {
+    window.print();
+  });
+
   // Run again button
   document.getElementById('run-again-btn').addEventListener('click', () => {
     state.phase = 'setup';

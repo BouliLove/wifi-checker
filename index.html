@@ -648,10 +648,53 @@
       gap: 12px;
     }
 
+    .results-footer-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .results-timestamp {
       font-family: var(--font-mono);
       font-size: var(--text-caption-1);
       color: rgba(14,14,14,0.35);
+    }
+
+    /* ============================================================
+       PRINT / PDF
+       ============================================================ */
+    @media print {
+      /* Hide everything except the results view */
+      #view-setup,
+      #view-testing {
+        display: none !important;
+      }
+
+      #view-results {
+        display: block !important;
+        padding: 0;
+      }
+
+      /* Hide interactive controls */
+      .results-footer-actions {
+        display: none !important;
+      }
+
+      /* Ensure backgrounds and colors print */
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      /* Avoid page breaks inside cards */
+      .card,
+      .card-dark,
+      .metric-card,
+      .summary-card,
+      .employee-card,
+      .isp-bar {
+        break-inside: avoid;
+      }
     }
 
     /* ============================================================
@@ -901,7 +944,10 @@
       <!-- Footer -->
       <div class="results-footer">
         <div class="results-timestamp" id="results-timestamp"></div>
-        <button class="btn btn-outline btn-m" id="run-again-btn">RELANCER</button>
+        <div class="results-footer-actions">
+          <button class="btn btn-outline btn-m" id="print-btn">IMPRIMER PDF</button>
+          <button class="btn btn-outline btn-m" id="run-again-btn">RELANCER</button>
+        </div>
       </div>
 
     </div>

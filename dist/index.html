@@ -648,10 +648,49 @@
       gap: 12px;
     }
 
+    .results-footer-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .results-timestamp {
       font-family: var(--font-mono);
       font-size: var(--text-caption-1);
       color: rgba(14,14,14,0.35);
+    }
+
+    /* ============================================================
+       PRINT / PDF
+       ============================================================ */
+    @media print {
+      #view-setup,
+      #view-testing {
+        display: none !important;
+      }
+
+      #view-results {
+        display: block !important;
+        padding: 0;
+      }
+
+      .results-footer-actions {
+        display: none !important;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .card,
+      .card-dark,
+      .metric-card,
+      .summary-card,
+      .employee-card,
+      .isp-bar {
+        break-inside: avoid;
+      }
     }
 
     /* ============================================================
@@ -901,7 +940,10 @@
       <!-- Footer -->
       <div class="results-footer">
         <div class="results-timestamp" id="results-timestamp"></div>
-        <button class="btn btn-outline btn-m" id="run-again-btn">RELANCER</button>
+        <div class="results-footer-actions">
+          <button class="btn btn-outline btn-m" id="print-btn">IMPRIMER PDF</button>
+          <button class="btn btn-outline btn-m" id="run-again-btn">RELANCER</button>
+        </div>
       </div>
 
     </div>
