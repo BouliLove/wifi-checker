@@ -653,6 +653,90 @@
       font-size: var(--text-caption-1);
       color: rgba(14,14,14,0.35);
     }
+
+    /* ============================================================
+       MULTI-ZONE TOGGLE
+       ============================================================ */
+    .zone-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .zone-toggle-label {
+      font-family: var(--font-body);
+      font-size: var(--text-body-2);
+      color: rgba(14,14,14,0.7);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: rgba(14,14,14,0.18);
+      border-radius: 10px;
+      transition: background 0.2s ease;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color-white);
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--color-primary);
+    }
+
+    .toggle-switch input:checked + .toggle-track::after {
+      transform: translateX(16px);
+    }
+
+    /* Zone section — hidden until toggle is on */
+    .zone-section {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      background: rgba(14,14,14,0.04);
+      border-radius: 8px;
+      border-left: 3px solid var(--color-primary);
+    }
+
+    .zone-section.visible {
+      display: flex;
+    }
+
+    .zone-helper {
+      font-family: var(--font-body);
+      font-size: var(--text-body-3);
+      color: rgba(14,14,14,0.45);
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -684,7 +768,7 @@
 
         <!-- Employee Count -->
         <div class="form-group">
-          <label class="form-label" for="employee-count">Utilisateurs simultanés</label>
+          <label class="form-label" for="employee-count">Utilisateurs dans le bureau</label>
           <div class="employee-row">
             <button class="btn btn-outline btn-s" id="employee-dec" aria-label="Diminuer">−</button>
             <input
@@ -707,6 +791,30 @@
             >
           </div>
           <div class="employee-error" id="employee-error">Veuillez saisir un nombre valide d'utilisateurs (1–500)</div>
+        </div>
+
+        <!-- Multi-zone toggle -->
+        <div class="zone-toggle-row">
+          <label class="toggle-switch" for="zone-toggle">
+            <input type="checkbox" id="zone-toggle">
+            <span class="toggle-track"></span>
+          </label>
+          <label class="zone-toggle-label" for="zone-toggle">
+            Mon bureau a plusieurs boitiers WiFi (zones)
+          </label>
+        </div>
+
+        <!-- Zone section — revealed by toggle -->
+        <div class="zone-section" id="zone-section">
+          <label class="form-label" for="zone-count">Utilisateurs dans ma zone WiFi</label>
+          <div class="employee-row">
+            <button class="btn btn-outline btn-s" id="zone-dec">−</button>
+            <input id="zone-count" class="input employee-input" type="number" min="1" max="500" value="10">
+            <button class="btn btn-outline btn-s" id="zone-inc">+</button>
+            <input id="zone-slider" class="employee-slider" type="range" min="1" max="500" value="10">
+          </div>
+          <div class="zone-helper">Seuls les utilisateurs connectés au même boitier WiFi que vous seront comptés.</div>
+          <div class="employee-error" id="zone-error">Veuillez saisir un nombre valide (1–500)</div>
         </div>
 
         <!-- Test tags -->
@@ -779,7 +887,7 @@
       </div>
 
       <!-- Per-Employee Analysis -->
-      <p class="section-heading">Bande passante par utilisateur</p>
+      <p class="section-heading" id="peruser-heading">Bande passante par utilisateur</p>
       <div class="card employee-card" id="employee-card">
         <!-- Populated by JS -->
       </div>

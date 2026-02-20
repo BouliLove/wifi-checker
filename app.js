@@ -78,6 +78,8 @@ const USE_CASES = [
 const state = {
   officeName: '',
   employeeCount: 25,
+  multiZone: false,
+  zoneUserCount: 10,
   phase: 'setup',       // 'setup' | 'testing' | 'results'
   currentPhase: null,
   aborted: false,
@@ -118,18 +120,45 @@ function getEmployeeCount() {
   return isNaN(val) ? 0 : val;
 }
 
+function getZoneUserCount() {
+  const val = parseInt(document.getElementById('zone-count').value, 10);
+  return isNaN(val) ? 0 : val;
+}
+
+function getEffectiveUserCount() {
+  return state.multiZone ? state.zoneUserCount : state.employeeCount;
+}
+
 function validateEmployees() {
   const count = getEmployeeCount();
   const input = document.getElementById('employee-count');
   const error = document.getElementById('employee-error');
+  let valid = true;
+
   if (count < 1 || count > 500) {
     input.classList.add('error');
     error.classList.add('visible');
-    return false;
+    valid = false;
+  } else {
+    input.classList.remove('error');
+    error.classList.remove('visible');
   }
-  input.classList.remove('error');
-  error.classList.remove('visible');
-  return true;
+
+  if (state.multiZone) {
+    const zoneCount = getZoneUserCount();
+    const zoneInput = document.getElementById('zone-count');
+    const zoneError = document.getElementById('zone-error');
+    if (zoneCount < 1 || zoneCount > 500) {
+      zoneInput.classList.add('error');
+      zoneError.classList.add('visible');
+      valid = false;
+    } else {
+      zoneInput.classList.remove('error');
+      zoneError.classList.remove('visible');
+    }
+  }
+
+  return valid;
 }
 
 /* ----------------------------------------------------------
@@ -480,6 +509,8 @@ async function runAllTests() {
 
   state.officeName = document.getElementById('office-name').value.trim();
   state.employeeCount = getEmployeeCount();
+  state.multiZone = document.getElementById('zone-toggle').checked;
+  state.zoneUserCount = state.multiZone ? getZoneUserCount() : state.employeeCount;
   state.aborted = false;
   state.phase = 'testing';
   state.results = {};
@@ -567,8 +598,10 @@ async function runAllTests() {
         setPhaseStatus('consistency', 'done', result.consistencyPct + '%');
 
       } else if (phase.id === 'peremployee') {
-        const mbpsPerUser = state.results.downloadMbps / state.employeeCount;
+        const effectiveCount = getEffectiveUserCount();
+        const mbpsPerUser = state.results.downloadMbps / effectiveCount;
         state.results.mbpsPerEmployee = Math.round(mbpsPerUser * 100) / 100;
+        state.results.effectiveUserCount = effectiveCount;
         setPhaseStatus('peremployee', 'done', state.results.mbpsPerEmployee + ' Mbps/util.');
       }
 
@@ -602,9 +635,11 @@ async function runAllTests() {
 
   // Fill missing per-employee if download somehow skipped
   if (!state.results.mbpsPerEmployee && state.results.downloadMbps) {
+    const effectiveCount = getEffectiveUserCount();
     state.results.mbpsPerEmployee = Math.round(
-      (state.results.downloadMbps / state.employeeCount) * 100
+      (state.results.downloadMbps / effectiveCount) * 100
     ) / 100;
+    state.results.effectiveUserCount = effectiveCount;
   }
 
   await new Promise(r => setTimeout(r, 400)); // brief pause for UX
@@ -660,8 +695,23 @@ function renderResults() {
   // Header
   const title = state.officeName ? `${state.officeName} — Résultats` : 'Résultats de l\'analyse';
   document.getElementById('results-title').textContent = title;
-  document.getElementById('results-meta').textContent =
-    `${state.employeeCount} utilisateur${state.employeeCount !== 1 ? 's' : ''}`;
+
+  const effectiveCount = r.effectiveUserCount || state.employeeCount;
+  if (state.multiZone) {
+    document.getElementById('results-meta').textContent =
+      `${effectiveCount} util. dans la zone · ${state.employeeCount} dans le bureau`;
+  } else {
+    document.getElementById('results-meta').textContent =
+      `${state.employeeCount} utilisateur${state.employeeCount !== 1 ? 's' : ''}`;
+  }
+
+  // Per-user section heading
+  const peruserHeading = document.getElementById('peruser-heading');
+  if (peruserHeading) {
+    peruserHeading.textContent = state.multiZone
+      ? `Bande passante par utilisateur — zone (${effectiveCount} personnes)`
+      : 'Bande passante par utilisateur';
+  }
 
   // ISP bar
   const ispBar = document.getElementById('isp-bar');
@@ -788,7 +838,7 @@ function renderResults() {
         `;
       }).join('')}
     </div>
-    <div class="employee-summary">${employeeSummaryText(mppu, state.employeeCount)}</div>
+    <div class="employee-summary">${employeeSummaryText(mppu, effectiveCount, state.multiZone)}</div>
   `;
 
   // Summary card
@@ -851,20 +901,23 @@ function verdictHeadline(score, results, scores) {
   return 'Problèmes critiques de connectivité — une action immédiate est recommandée.';
 }
 
-function employeeSummaryText(mbpsPerUser, count) {
+function employeeSummaryText(mbpsPerUser, count, multiZone) {
+  const context = multiZone
+    ? `${count} utilisateurs dans votre zone WiFi`
+    : `${count} utilisateurs simultanés`;
   if (mbpsPerUser >= 10) {
-    return `Avec ${count} utilisateurs simultanés, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — une marge confortable pour toutes les tâches.`;
+    return `Avec ${context}, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — une marge confortable pour toutes les tâches.`;
   }
   if (mbpsPerUser >= 5) {
-    return `Avec ${count} utilisateurs simultanés, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — suffisant pour le travail standard, limité pour la vidéo intensive.`;
+    return `Avec ${context}, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — suffisant pour le travail standard, limité pour la vidéo intensive.`;
   }
   if (mbpsPerUser >= 2) {
-    return `Avec ${count} utilisateurs simultanés, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — adapté aux appels vidéo, serré pour les tâches gourmandes en données.`;
+    return `Avec ${context}, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — adapté aux appels vidéo, serré pour les tâches gourmandes en données.`;
   }
   if (mbpsPerUser >= 0.1) {
-    return `Avec ${count} utilisateurs simultanés, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — seule la communication de base est supportée. Une mise à niveau est conseillée.`;
+    return `Avec ${context}, chaque personne dispose de ${mbpsPerUser.toFixed(2)} Mbps — seule la communication de base est supportée. Une mise à niveau est conseillée.`;
   }
-  return `Avec ${count} utilisateurs simultanés, la bande passante par personne est critiquement basse. Une mise à niveau significative est nécessaire.`;
+  return `Avec ${context}, la bande passante par personne est critiquement basse. Une mise à niveau significative est nécessaire.`;
 }
 
 function buildRecommendations(score, results, scores) {
@@ -905,7 +958,10 @@ function buildRecommendations(score, results, scores) {
   }
 
   if (results.mbpsPerEmployee < 2 && results.downloadMbps > 0) {
-    recs.push(`À ${results.mbpsPerEmployee.toFixed(2)} Mbps par utilisateur, la visioconférence sera difficile — augmentez la bande passante ou réduisez le nombre d'utilisateurs simultanés.`);
+    const zoneCtx = state.multiZone
+      ? ` (${results.effectiveUserCount} utilisateurs dans la zone)`
+      : '';
+    recs.push(`À ${results.mbpsPerEmployee.toFixed(2)} Mbps par utilisateur${zoneCtx}, la visioconférence sera difficile — augmentez la bande passante ou réduisez le nombre d'utilisateurs simultanés.`);
   }
 
   if (recs.length === 0) {
@@ -954,6 +1010,53 @@ function setupControls() {
     countInput.value = val;
     slider.value = val;
     validateEmployees();
+  });
+
+  // Zone toggle + zone stepper
+  const zoneToggle = document.getElementById('zone-toggle');
+  const zoneSection = document.getElementById('zone-section');
+  const zoneCountInput = document.getElementById('zone-count');
+  const zoneSlider = document.getElementById('zone-slider');
+  const zoneDecBtn = document.getElementById('zone-dec');
+  const zoneIncBtn = document.getElementById('zone-inc');
+
+  zoneToggle.addEventListener('change', () => {
+    state.multiZone = zoneToggle.checked;
+    if (state.multiZone) {
+      zoneSection.classList.add('visible');
+    } else {
+      zoneSection.classList.remove('visible');
+      // Clear zone error when hiding
+      document.getElementById('zone-count').classList.remove('error');
+      document.getElementById('zone-error').classList.remove('visible');
+    }
+  });
+
+  zoneCountInput.addEventListener('input', () => {
+    const val = parseInt(zoneCountInput.value, 10);
+    if (!isNaN(val) && val >= 1 && val <= 500) {
+      zoneSlider.value = val;
+    }
+    if (state.multiZone) validateEmployees();
+  });
+
+  zoneSlider.addEventListener('input', () => {
+    zoneCountInput.value = zoneSlider.value;
+    if (state.multiZone) validateEmployees();
+  });
+
+  zoneDecBtn.addEventListener('click', () => {
+    const val = Math.max(1, (parseInt(zoneCountInput.value, 10) || 1) - 1);
+    zoneCountInput.value = val;
+    zoneSlider.value = val;
+    if (state.multiZone) validateEmployees();
+  });
+
+  zoneIncBtn.addEventListener('click', () => {
+    const val = Math.min(500, (parseInt(zoneCountInput.value, 10) || 1) + 1);
+    zoneCountInput.value = val;
+    zoneSlider.value = val;
+    if (state.multiZone) validateEmployees();
   });
 
   // Run button
