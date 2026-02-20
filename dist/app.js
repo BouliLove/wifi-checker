@@ -437,9 +437,35 @@ async function fetchIspInfo() {
     // org is e.g. "AS12322 Free SAS" — strip the ASN prefix
     const org = data.org || '';
     const ispName = org.replace(/^AS\d+\s*/, '') || null;
-    return { ispName, publicIp: data.ip || null };
+    const publicIp = data.ip || null;
+    const asnMatch = org.match(/^AS(\d+)/);
+    const asn = asnMatch ? asnMatch[1] : null;
+
+    // Try to get the upstream/transit operator (e.g. Orange France for ielo)
+    let managerName = null;
+    if (asn) {
+      try {
+        const ctrl2 = new AbortController();
+        const t2 = setTimeout(() => ctrl2.abort(), 4000);
+        const resp2 = await fetch(`https://api.bgpview.io/asn/${asn}/upstreams`, {
+          signal: ctrl2.signal,
+          cache: 'no-store',
+        });
+        clearTimeout(t2);
+        const data2 = await resp2.json();
+        const upstreams = data2?.data?.ipv4_upstreams || [];
+        if (upstreams.length > 0) {
+          const name = upstreams[0].description || upstreams[0].name || '';
+          if (name && name.toLowerCase() !== ispName?.toLowerCase()) {
+            managerName = name;
+          }
+        }
+      } catch { /* ignore */ }
+    }
+
+    return { ispName, managerName, publicIp };
   } catch {
-    return { ispName: null, publicIp: null };
+    return { ispName: null, managerName: null, publicIp: null };
   }
 }
 
@@ -586,6 +612,7 @@ async function runAllTests() {
   try {
     const isp = await ispPromise;
     state.results.ispName = isp.ispName;
+    state.results.managerName = isp.managerName;
     state.results.publicIp = isp.publicIp;
   } catch {
     // ISP fetch failed silently — no impact on results
@@ -638,11 +665,22 @@ function renderResults() {
 
   // ISP bar
   const ispBar = document.getElementById('isp-bar');
-  if (r.ispName) {
+  if (r.ispName || r.managerName) {
     ispBar.style.display = '';
     ispBar.innerHTML = `
-      <span class="isp-bar-label">Fournisseur</span>
-      <span class="isp-bar-value">${r.ispName}</span>
+      ${r.ispName ? `
+        <div class="isp-bar-item">
+          <span class="isp-bar-label">Fournisseur</span>
+          <span class="isp-bar-value">${r.ispName}</span>
+        </div>
+      ` : ''}
+      ${r.ispName && r.managerName ? `<div class="isp-bar-sep"></div>` : ''}
+      ${r.managerName ? `
+        <div class="isp-bar-item">
+          <span class="isp-bar-label">Opérateur réseau</span>
+          <span class="isp-bar-value">${r.managerName}</span>
+        </div>
+      ` : ''}
       ${r.publicIp ? `<span class="isp-bar-ip">${r.publicIp}</span>` : ''}
     `;
   } else {
