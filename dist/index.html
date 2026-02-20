@@ -410,6 +410,7 @@
       font-size: var(--text-body-2);
       font-weight: var(--fw-semibold);
       color: var(--color-primary);
+      word-break: break-word;
     }
 
     .isp-bar-ip {
@@ -558,6 +559,23 @@
 
     @media (max-width: 560px) {
       .summary-card { flex-direction: column; align-items: center; }
+    }
+
+    @media (max-width: 560px) {
+      .isp-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .isp-bar-sep {
+        display: none;
+      }
+
+      .isp-bar-ip {
+        margin-left: 0;
+        font-size: var(--text-caption-2);
+      }
     }
 
     .score-ring-wrap {
