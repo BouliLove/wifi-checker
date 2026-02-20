@@ -270,8 +270,9 @@ function scoreColor(score) {
 
 async function testLatency() {
   const SAMPLES = 20;
-  const url = 'https://1.1.1.1/cdn-cgi/trace';
+  const url = 'https://speed.cloudflare.com/cdn-cgi/trace';
   const times = [];
+  let failed = 0;
 
   for (let i = 0; i < SAMPLES; i++) {
     if (state.aborted) throw new Error('aborted');
@@ -280,12 +281,17 @@ async function testLatency() {
       await fetch(url + '?_=' + Date.now() + i, { cache: 'no-store' });
       times.push(performance.now() - t0);
     } catch {
-      // count as high latency sample
-      times.push(3000);
+      failed++;
     }
     // Live update
-    const avg = times.reduce((a, b) => a + b, 0) / times.length;
-    setPhaseStatus('latency', 'active', Math.round(avg) + ' ms moy.');
+    if (times.length > 0) {
+      const avg = times.reduce((a, b) => a + b, 0) / times.length;
+      setPhaseStatus('latency', 'active', Math.round(avg) + ' ms moy.');
+    }
+  }
+
+  if (times.length === 0) {
+    return { latencyMs: null, latencyMin: null, latencyMax: null, jitterMs: null, samples: [] };
   }
 
   const avg = times.reduce((a, b) => a + b, 0) / times.length;
@@ -309,7 +315,7 @@ async function testLatency() {
 async function testPacketLoss() {
   const PROBES = 30;
   const TIMEOUT_MS = 3000;
-  const url = 'https://1.1.1.1/cdn-cgi/trace';
+  const url = 'https://speed.cloudflare.com/cdn-cgi/trace';
   let failed = 0;
 
   for (let i = 0; i < PROBES; i++) {
